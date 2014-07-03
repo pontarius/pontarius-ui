@@ -1,6 +1,25 @@
 Mock-Ups
 ========
 
+Settings
+--------
+
+The settings panel overlay (to be integrated with the GNOME control center application) allows the user to configure three things: The XMPP account to use, whether to connect automatically, and which identity (GnuPG key) to use (during Pontarius key exchanges).
+
+![](settings_overlay_preview.png)
+
+Clicking on the account row brings up the account settings.
+
+![](settings_xmpp_account_dialog_preview.png)
+
+Clicking on the identity row allows the user to select which identity (key) is used, generate a new identity, and mark an identity as revoked.
+
+![](settings_identity_management_dialog_preview.png)
+
+If the revoke button (the one with a "forbidden" icon) is clicked, the user is asked to confirm the (destructive) action. After this is done, the Identity Management dialog displays a forbidden icon in the place where the checkmark would be.
+
+![](settings_identity_management_dialog_revoke_dialog_preview.png)
+
 Trust
 -----
 
@@ -23,3 +42,8 @@ Clicking on the Status row allows the user to verify the fingerprint and/or the 
 Analogously, clicking on the Revoked row will allow for the (destructive) action of revoking the peer's identity.
 
 ![](trust_revoke_identity_dialog_preview.png)
+
+Trademark Notice
+----------------
+
+The GNOME logo and GNOME name are registered trademarks or trademarks of GNOME Foundation in the United States or other countries.
