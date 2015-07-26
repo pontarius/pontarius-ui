@@ -1,0 +1,6 @@
+{
+    "description": "Pontarius integration for GNOME™.",
+    "name": "Pontarius",
+    "shell-version": ["3.16"],
+    "uuid": "extension@pontarius.org"
+}
