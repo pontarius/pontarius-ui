@@ -50,6 +50,9 @@ function enable() {
         // TODO: Catch notification proxy creation error.
         function (notifications) {
             _notifications = notifications;
+
+            _notifications.connectSignal('ActionInvoked', _onActionInvoked);
+
             // Initialize Pontarius D-Bus interface.
             // TODO: Catch notification proxy creation error.
             const PontariusInterface = '<node name="pontarius"><interface name="org.pontarius"><method name="addPeer"><arg name="jid" type="s" direction="in"/></method><method name="createIdentity"><arg name="key_id" type="ay" direction="out"/></method><method name="getContactIdentities"><arg name="contact" type="s" direction="in"/><arg name="identities" type="a{sas}" direction="out"/></method><method name="getContactPeers"><arg name="contact" type="s" direction="in"/><arg name="peers" type="a{sa{ss}}" direction="out"/></method><method name="getContacts"><arg name="contacts" type="a((ss)b)" direction="out"/></method><method name="getCredentials"><arg name="username" type="s" direction="out"/></method><method name="getIdentities"><arg name="identities" type="as" direction="out"/></method><method name="getIdentityChallenges"><arg name="key_id" type="s" direction="in"/><arg name="challenges" type="a(ssbsssb)" direction="out"/></method><method name="getSessionsByIdentity"><arg name="jid" type="s" direction="in"/><arg name="sessions" type="a(ayssssuu)" direction="out"/></method><method name="getSessionsByJID"><arg name="jid" type="s" direction="in"/><arg name="sessions" type="a(ayssssuu)" direction="out"/></method><method name="keyTrustStatus"><arg name="key_id" type="s" direction="in"/><arg name="is_trusted" type="b" direction="out"/></method><method name="getUnlinkedPeers"><arg name="unlinkedPeers" type="a{ss}" direction="out"/></method><method name="initialize"><arg name="state" type="y" direction="out"/></method><method name="initiateChallenge"><arg name="peer" type="s" direction="in"/><arg name="question" type="s" direction="in"/><arg name="secret" type="s" direction="in"/></method><method name="linkIdentity"><arg name="identity" type="s" direction="in"/><arg name="contact" type="s" direction="in"/></method><method name="identityVerified"><arg name="key_id" type="s" direction="in"/><arg name="is_verified" type="b" direction="in"/></method><method name="newContact"><arg name="name" type="s" direction="in"/><arg name="contact_id" type="s" direction="out"/></method><method name="removeChallenge"><arg name="challenge_id" type="s" direction="in"/></method><method name="removeContacts"><arg name="contact" type="s" direction="in"/></method><method name="removePeer"><arg name="peer" type="s" direction="in"/></method><method name="renameContact"><arg name="contact" type="s" direction="in"/><arg name="name" type="s" direction="in"/></method><method name="respondChallenge"><arg name="peer" type="s" direction="in"/><arg name="secret" type="s" direction="in"/></method><method name="revokeIdentity"><arg name="key_id" type="s" direction="in"/></method><method name="setCredentials"><arg name="username" type="s" direction="in"/><arg name="password" type="s" direction="in"/></method><method name="setIdentity"><arg name="keyID" type="s" direction="in"/></method><method name="unlinkIdentity"><arg name="identity" type="s" direction="in"/></method><signal name="challengeResult"><arg name="peer" type="s"/><arg name="challenge_id" type="s"/><arg name="initiator" type="s"/><arg name="result" type="b"/></signal><signal name="contactRemoved"><arg name="contact" type="s"/></signal><signal name="contactRenamed"><arg name="contact" type="s"/><arg name="name" type="s"/></signal><signal name="contactStatusChanged"><arg name="contact" type="s"/><arg name="contact_name" type="s"/><arg name="status" type="y"/></signal><signal name="identityStatusChanged"><arg name="identity" type="s"/><arg name="peer" type="s"/><arg name="contact" type="s"/><arg name="status" type="y"/></signal><signal name="identityUnlinkedSignal"><arg name="identity" type="s"/></signal><signal name="peerTrustStatusChanged"><arg name="peer" type="s"/><arg name="trust_status" type="b"/></signal><signal name="receivedChallenge"><arg name="peer" type="s"/><arg name="question" type="s"/></signal><signal name="subscriptionRequest"><arg name="peer" type="s"/></signal><signal name="unlinkedIdentityStatusChanged"><arg name="identity" type="s"/><arg name="peer" type="s"/><arg name="status" type="y"/></signal><property name="Identity" type="s" access="read"/><property name="Status" type="y" access="read"/><property name="AccountEnabled" type="b" access="readwrite"/><property name="Username" type="s" access="read"/></interface></node>';
@@ -78,20 +81,28 @@ function _onStatusChanged(result, error) {
         _state = result;
     }
     else {
-        var readMore = function (id) {
-            Util.spawn(['gvfs-open', 'https://www.pontarius.org/resources/' + id]);
-        };
-        readMore('hello');
         _notifications.NotifyRemote(
             'Pontarius',
             '',
             '',
             'Unexpected Pontarius error',
             'An unexpected Pontarius-related error occurred. The error was of type "' + Gio.DBusError.get_remote_error(error) + '".',
-            [], // ['article-617bf098-277d-40c2-8be2-8ca1d2cc959f', 'Read more on the web'],
+            ['article-617bf098-277d-40c2-8be2-8ca1d2cc959f', 'Read more on the web'],
             {},
             (-1)
         );
         log('Unexpected Pontarius error: ' + Gio.DBusError.get_remote_error(error));
     }
 }
+
+function _onActionInvoked(proxy, id, key) {
+    var openArticle = function (id) {
+        Util.spawn(['gvfs-open', 'https://www.pontarius.org/article/' + id]);
+    };
+
+    if(key[1] === 'article-617bf098-277d-40c2-8be2-8ca1d2cc959f') {
+        openArticle('617bf098-277d-40c2-8be2-8ca1d2cc959f');
+    } else {
+        log('Unhandled ActionInvoked signal: ' + key);
+    }
+};
