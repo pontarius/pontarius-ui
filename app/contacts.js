@@ -20,7 +20,6 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-const GConf = imports.gi.GConf;
 const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GObject = imports.gi.GObject;
